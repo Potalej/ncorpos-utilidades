@@ -28,7 +28,7 @@ option(USE_EXTERNAL_TIPOS
 target_sources(utilidades
   PRIVATE
     src/utilidades.f90
-    include/tipos_compat.F90
+    include/tipos.F90
 )
 
 # ============================================================================

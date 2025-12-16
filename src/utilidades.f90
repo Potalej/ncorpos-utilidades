@@ -19,7 +19,7 @@
 !   oap
 ! 
 MODULE utilidades
-  USE tipos_compat
+  USE tipos
   IMPLICIT NONE
   EXTERNAL dgesv
   EXTERNAL dsyev
