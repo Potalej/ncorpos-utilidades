@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(utilidades LANGUAGES Fortran)
+project(utilidades VERSION 0.1.0 LANGUAGES Fortran)
 
 # --------------------------------------------------
 # Biblioteca
