@@ -69,4 +69,6 @@ FIND_LIBRARY(OpenBLAS_LIB NAMES
 )
 
 message("-- OpenBLAS_INCLUDE_DIR: ${OpenBLAS_INCLUDE_DIR}")
-messagE("-- OpenBLAS_LIB: ${OpenBLAS_LIB}")
+message("-- OpenBLAS_LIB: ${OpenBLAS_LIB}")
+
+message(STATUS "OpenBLAS_HOME: $ENV{OpenBLAS_HOME}")
