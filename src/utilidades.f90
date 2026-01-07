@@ -8,12 +8,12 @@
 !   auxiliares voltadas para o calculo vetorial, resolucao de 
 !   sistemas e afins.
 ! 
-!   Este modulo depende do OpenBLAS/LAPACK devido as rotinas dgesv
-!   e dsyev.
+!   Este modulo depende do OpenBLAS/LAPACK devido a rotina dsyev para
+!   calcular autovalores.
 ! 
 ! Modificado:
 !   02 de fevereiro de 2024 (criado)
-!   08 de agosto de 2025 (modificado)
+!   07 de janeiro de 2026 (modificado)
 ! 
 ! Autoria:
 !   oap
@@ -21,7 +21,6 @@
 MODULE utilidades
   USE tipos
   IMPLICIT NONE
-  EXTERNAL dgesv
   EXTERNAL dsyev
   PUBLIC
 
@@ -93,34 +92,64 @@ REAL FUNCTION determinante (M) RESULT (det)
 END FUNCTION determinante
 
 ! ************************************************************
-!! Sistema linear de 3 equacoes (dgesv)
+!! Sistema linear de 3 equacoes
 !
 ! Objetivos:
-!   Resolve um sistema de 3 equacoes lineares usando o dgesv
+!   Resolve um sistema de 3 equacoes lineares
 !
 ! Modificado:
-!   15 de marco de 2024
+!   07 de janeiro de 2026
 !
 ! Autoria:
 !   oap
 ! 
-FUNCTION sistema_linear3 (A, b)
-
+FUNCTION sistema_linear3 (A_orig, b) RESULT(sol)
   IMPLICIT NONE
-  REAL(pf) :: A(3,3), b(3)
-  REAL(pf) :: sistema_linear3(3), matriz(3,3)
-  INTEGER  :: PIVOS(3), INFO
+  REAL(pf) :: A_orig(3,3), b(3)
+  REAL(pf) :: tmp(4), sol(3), A(3,4)
+  INTEGER  :: pivo
+  
+  ! Matriz 3 x 4 [A | b]
+  A = RESHAPE((/ A_orig, b /), [3,4])
 
-  sistema_linear3 = b
-  matriz = A
+  !> Primeira linha
+  pivo = 1
+  IF (ABS(A(pivo, 1)) < ABS(A(2, 1))) pivo = 2
+  IF (ABS(A(pivo, 1)) < ABS(A(3, 1))) pivo = 3
 
-  CALL dgesv(3,1,matriz,3,PIVOS,sistema_linear3,3,INFO)
-
-  IF (INFO < 0) THEN
-    WRITE (*, '(a)') 'O ', -INFO, '-ÉSIMO PARAMETRO TEM UM VALOR ILEGAL'
-  ELSE IF (INFO > 0) then
-    WRITE (*, '(a)') 'MATRIZ SINGULAR! SEM SOLUCAO'
+  ! Pivota se pivo != 1
+  IF (pivo .NE. 1) THEN
+    tmp       = A(pivo,:)
+    A(pivo,:) = A(1,:)
+    A(1,:)    = tmp
   ENDIF
+
+  ! Eliminacao
+  tmp = A(1,:) / A(1,1)
+  A(3,:) = A(3,:) - tmp * A(3,1)
+  A(2,:) = A(2,:) - tmp * A(2,1)
+  A(1,:) = tmp
+  
+  !> Segunda linha
+  ! Pivota se precisar
+  IF (ABS(A(2, 2)) < ABS(A(3, 2))) THEN
+    tmp = A(3,:)
+    A(3,:) = A(2,:)
+    A(2,:) = tmp
+  ENDIF
+
+  ! Eliminacao
+  A(3,:) = A(3,:) - A(2,:) * A(3,2) / A(2,2)
+  A(2,:) = A(2,:) / A(2,2)
+
+  !> Terceira linha
+  A(3,:) = A(3,:) / A(3,3)
+
+  !> Resolvendo
+  sol(3) = A(3,4)
+  sol(2) = A(2,4) - A(2,3) * sol(3)
+  sol(1) = A(1,4) - A(1,3) * sol(3) - A(1,2) * sol(2)
+  
 END FUNCTION sistema_linear3
 
 ! ************************************************************

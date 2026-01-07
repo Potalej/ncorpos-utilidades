@@ -3,7 +3,7 @@
 # ============================================================================
 cmake_minimum_required(VERSION 3.15)
 project(utilidades 
-        VERSION 1.0.0 
+        VERSION 1.0.1 
         DESCRIPTION "Utilidades para N-corpos"
         LANGUAGES Fortran)
 set(NCORPOS_UTILIDADES_PROJECT_VERSION ${PROJECT_VERSION} CACHE INTERNAL "")
